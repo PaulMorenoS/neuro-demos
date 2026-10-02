@@ -13,7 +13,7 @@ try{
  await mkdir('screenshots',{recursive:true});
  await page.goto(base);await page.evaluate(()=>document.fonts.ready);
  await page.locator('.cover-tile img').last().waitFor();
- await page.screenshot({path:'screenshots/visitors-desktop.png',fullPage:true});
+ await page.waitForTimeout(650);await page.screenshot({path:'screenshots/visitors-desktop.png',fullPage:true});
  assert.equal(await page.locator('.inspiration-card').count(),6);
  await page.getByRole('button',{name:'Moda',exact:true}).click();
  assert.equal(await page.locator('.inspiration-card').count(),1);
@@ -21,7 +21,7 @@ try{
  await page.waitForURL('**/studio.html?idea=editorial');
  assert.match(await page.locator('#prompt').inputValue(),/Retrato editorial/);
  assert.equal(await page.locator('.preview-buttons').count(),0,'Inspiration is not a saved project');
- await page.screenshot({path:'screenshots/create-desktop.png',fullPage:true});
+ await page.waitForTimeout(650);await page.screenshot({path:'screenshots/create-desktop.png',fullPage:true});
  const balance=await page.locator('#sidebar-balance').innerText();
  await page.locator('#generate').click();await page.waitForTimeout(2700);
  assert.notEqual(await page.locator('#sidebar-balance').innerText(),balance);
@@ -34,7 +34,7 @@ try{
  assert.ok(!document.includes('assets/neuro-v14/'),'Export has no broken relative assets');
  await page.locator('#close-modal').click();
  await page.locator('aside nav [data-page="explore"]').click();
- await page.screenshot({path:'screenshots/explore-desktop.png',fullPage:true});
+ await page.waitForTimeout(650);await page.screenshot({path:'screenshots/explore-desktop.png',fullPage:true});
  await page.locator('[data-idea="film"]').first().click();
  assert.equal(await page.locator('[data-mode="video"]').getAttribute('class'),'selected');
  const video=page.locator('.sample-video');await video.evaluate(v=>v.play());
@@ -52,13 +52,13 @@ try{
  for(const width of [390,360]){
   await page.setViewportSize({width,height:844});await page.goto(base);await page.evaluate(()=>document.fonts.ready);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth), 'Visitor horizontal overflow '+width);
-  await page.screenshot({path:'screenshots/visitors-mobile-'+width+'.png',fullPage:true});
+  await page.waitForTimeout(650);await page.screenshot({path:'screenshots/visitors-mobile-'+width+'.png',fullPage:true});
   await page.goto(base+'studio.html');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth), 'Studio horizontal overflow '+width);
-  await page.screenshot({path:'screenshots/explore-mobile-'+width+'.png',fullPage:true});
+  await page.waitForTimeout(650);await page.screenshot({path:'screenshots/explore-mobile-'+width+'.png',fullPage:true});
   await page.locator('[data-idea="product"]').click();
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Create horizontal overflow '+width);
-  await page.screenshot({path:'screenshots/create-mobile-'+width+'.png',fullPage:true});
+  await page.waitForTimeout(650);await page.screenshot({path:'screenshots/create-mobile-'+width+'.png',fullPage:true});
  }
  assert.deepEqual(errors,[]);
  console.log('PASS: filters, preset handoff, generation debit, video playback, custom recharge, registration, desktop/mobile layouts.');
