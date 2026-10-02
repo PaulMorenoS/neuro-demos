@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const server=spawn('python3',['-m','http.server','8765','--bind','127.0.0.1'],{stdio:'ignore'});
 let browser;
@@ -24,9 +24,17 @@ try{
  const balance=await page.locator('#sidebar-balance').innerText();
  await page.locator('#generate').click();await page.waitForTimeout(2700);
  assert.notEqual(await page.locator('#sidebar-balance').innerText(),balance);
+ await page.locator('.preview-buttons [data-open]').click();
+ await page.locator('#add-scene').click();await page.locator('#close-modal').click();
+ await page.locator('aside [data-page="projects"]').click();await page.locator('#editor-btn').click();
+ const downloading=page.waitForEvent('download');await page.locator('#export-story').click();
+ const downloaded=await downloading;const document=await readFile(await downloaded.path(),'utf8');
+ assert.ok(document.includes('data:image/png;base64,'),'Export includes embedded image');
+ assert.ok(!document.includes('assets/neuro-v14/'),'Export has no broken relative assets');
+ await page.locator('#close-modal').click();
  await page.locator('aside [data-page="explore"]').click();
  await page.screenshot({path:'screenshots/explore-desktop.png',fullPage:true});
- await page.locator('[data-idea="film"]').click();
+ await page.locator('[data-idea="film"]').first().click();
  assert.equal(await page.locator('[data-mode="video"]').getAttribute('class'),'selected');
  const video=page.locator('.sample-video');await video.evaluate(v=>v.play());
  await page.waitForTimeout(300);assert.ok(await video.evaluate(v=>v.currentTime>0));
